@@ -1,0 +1,76 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+
+  <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" (click)="close()"></div>
+
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md">
+
+    <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-100">
+      <h2 class="text-lg font-bold text-slate-800">Nueva tarea</h2>
+      <button (click)="close()"
+              class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="px-6 py-5 flex flex-col gap-4">
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-slate-700">Título <span class="text-red-400">*</span></label>
+        <input formControlName="title" type="text" placeholder="Ej: Revisar documentación"
+               class="w-full px-3.5 py-2.5 rounded-lg border text-sm outline-none transition-colors
+                      placeholder:text-slate-300
+                      border-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+               [class.border-red-300]="title.invalid && title.touched"
+               [class.focus:border-red-400]="title.invalid && title.touched"/>
+        @if (title.touched && title.hasError('required')) {
+          <p class="text-xs text-red-500">El título es requerido</p>
+        }
+        @if (title.touched && title.hasError('maxlength')) {
+          <p class="text-xs text-red-500">Máximo 120 caracteres</p>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-slate-700">Descripción</label>
+        <textarea formControlName="description" rows="3" placeholder="Descripción opcional..."
+                  class="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm outline-none resize-none
+                         placeholder:text-slate-300 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-colors">
+        </textarea>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-slate-700">Asignado a <span class="text-red-400">*</span></label>
+        <input formControlName="assignee" type="text" placeholder="Nombre del responsable"
+               class="w-full px-3.5 py-2.5 rounded-lg border text-sm outline-none transition-colors
+                      placeholder:text-slate-300
+                      border-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+               [class.border-red-300]="assignee.invalid && assignee.touched"/>
+        @if (assignee.touched && assignee.hasError('required')) {
+          <p class="text-xs text-red-500">El responsable es requerido</p>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-slate-700">Fecha límite</label>
+        <input formControlName="dueDate" type="date"
+               class="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm outline-none transition-colors
+                      focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 text-slate-600"/>
+      </div>
+
+      <div class="flex gap-3 pt-2">
+        <button type="button" (click)="close()"
+                class="flex-1 px-4 py-2.5 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="form.invalid || submitting"
+                class="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700
+                       disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors cursor-pointer">
+          @if (submitting) { Creando... } @else { Crear tarea }
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

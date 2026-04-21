@@ -1,0 +1,117 @@
+<div class="min-h-screen bg-slate-50">
+
+  <header class="bg-indigo-700 shadow-lg">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-white font-bold text-lg leading-none">Task Manager</h1>
+          <p class="text-indigo-200 text-xs mt-0.5">Gestión de tareas del equipo</p>
+        </div>
+      </div>
+      <button (click)="showModal.set(true)"
+              class="inline-flex items-center gap-2 bg-white text-indigo-700 font-semibold text-sm
+                     px-4 py-2 rounded-lg hover:bg-indigo-50 transition-colors shadow-sm cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+        </svg>
+        Nueva tarea
+      </button>
+    </div>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
+      <div class="flex items-center justify-between gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          {{ errorMessage() }}
+        </div>
+        <button (click)="dismissError()" class="text-red-400 hover:text-red-600 cursor-pointer shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  }
+
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+
+    <div class="flex flex-wrap gap-2 mb-6">
+      @for (f of filters; track f.value) {
+        <button (click)="setFilter(f.value)"
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer"
+                [class.bg-indigo-600]="activeFilter() === f.value"
+                [class.text-white]="activeFilter() === f.value"
+                [class.shadow-sm]="activeFilter() === f.value"
+                [class.bg-white]="activeFilter() !== f.value"
+                [class.text-slate-600]="activeFilter() !== f.value"
+                [class.border]="activeFilter() !== f.value"
+                [class.border-slate-200]="activeFilter() !== f.value"
+                [class.hover:bg-slate-50]="activeFilter() !== f.value">
+          {{ f.label }}
+          <span class="text-xs px-1.5 py-0.5 rounded-full font-semibold"
+                [class.bg-indigo-500]="activeFilter() === f.value"
+                [class.text-indigo-100]="activeFilter() === f.value"
+                [class.bg-slate-100]="activeFilter() !== f.value"
+                [class.text-slate-500]="activeFilter() !== f.value">
+            {{ f.count() }}
+          </span>
+        </button>
+      }
+    </div>
+
+    @if (loading()) {
+      <div class="flex flex-col items-center justify-center py-20 text-slate-400">
+        <svg class="w-8 h-8 animate-spin mb-3" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+        </svg>
+        <p class="text-sm">Cargando tareas...</p>
+      </div>
+    } @else if (filteredTasks().length === 0) {
+      <div class="flex flex-col items-center justify-center py-20 text-slate-400">
+        <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mb-4">
+          <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+        </div>
+        <p class="font-medium text-slate-500 mb-1">No hay tareas</p>
+        <p class="text-sm text-slate-400">
+          @if (activeFilter() === 'ALL') {
+            Crea tu primera tarea con el botón "Nueva tarea"
+          } @else {
+            No hay tareas con este estado
+          }
+        </p>
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        @for (task of filteredTasks(); track task.id) {
+          <app-task-card
+            [task]="task"
+            (statusChanged)="onStatusChanged($event)"
+            (deleted)="onTaskDeleted($event)"/>
+        }
+      </div>
+    }
+
+  </div>
+</div>
+
+@if (showModal()) {
+  <app-task-form-modal
+    (taskCreated)="onTaskCreated($event)"
+    (closed)="showModal.set(false)"
+    (errorOccurred)="errorMessage.set($event)"/>
+}
